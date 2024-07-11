@@ -11,9 +11,9 @@ namespace AutomaticMouseMover
     private readonly Random Random;
     private Thread AnimationThread;
 
-    private static readonly int AnimationDurationMilliseconds = 1500;
-    private static readonly int AnimationSleepMilliseconds = 25;
-    private static readonly int AnimationDelayMilliseconds = 250;
+    private static readonly int AnimationDurationMilliseconds = 1200;
+    private static readonly int AnimationSleepMilliseconds = 10;
+    private static readonly int AnimationDelayMilliseconds = 300;
 
     public AutomaticMaouseMoverForm()
     {
