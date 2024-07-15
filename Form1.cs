@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -21,6 +22,28 @@ namespace AutomaticMouseMover
       Random = new Random((int) GetTicksInMilliseconds());
       mouseMove = false;
       AnimationThread = null;
+
+      ushort i = 0;
+      foreach (var screen in Screen.AllScreens)
+      {
+        var radioBtn = new RadioButton
+        {
+          Text = $"Schermo {i+1}",
+          Name = $"Screen{screen.GetHashCode()}",
+          Location = new Point(10, (i+1) * 25),
+          AutoSize = true,
+        };
+
+#if DEBUG
+        radioBtn.CheckedChanged += RadioBtnCheckedChanged;
+#endif
+
+        if (screen.Equals(Screen.PrimaryScreen))
+          radioBtn.Checked = true;
+
+        ScreenBox.Controls.Add(radioBtn);
+        ++i;
+      }
     }
 
     private void StartMouseMoveBtnClick(object sender, EventArgs e)
@@ -35,8 +58,14 @@ namespace AutomaticMouseMover
           var OldX = Cursor.Position.X;
           var OldY = Cursor.Position.Y;
 
-          var TotalDx = Random.Next(0, Screen.PrimaryScreen.Bounds.Width) - OldX;
-          var TotalDy = Random.Next(0, Screen.PrimaryScreen.Bounds.Height) - OldY;
+          int minX = SelectedScreen.Bounds.X;
+          int maxX = minX + SelectedScreen.Bounds.Width;
+
+          int minY = SelectedScreen.Bounds.Y;
+          int maxY = minY + SelectedScreen.Bounds.Height;
+
+          var TotalDx = Random.Next(minX, maxX) - OldX;
+          var TotalDy = Random.Next(minY, maxY) - OldY;
 
           var startAnimation = GetTicksInMilliseconds();
 
@@ -47,10 +76,10 @@ namespace AutomaticMouseMover
             if (!mouseMove)
               break;
 
-            var currentTicks = GetTicksInMilliseconds();
+            var animationPercentage = (GetTicksInMilliseconds() - startAnimation) / AnimationDurationMilliseconds;
 
-            int dx = (int)(TotalDx * (currentTicks - startAnimation) / AnimationDurationMilliseconds);
-            int dy = (int)(TotalDy * (currentTicks - startAnimation) / AnimationDurationMilliseconds);
+            int dx = (int)(TotalDx * animationPercentage);
+            int dy = (int)(TotalDy * animationPercentage);
 
             Cursor.Position = new Point(OldX + dx, OldY + dy);
           }
@@ -79,6 +108,24 @@ namespace AutomaticMouseMover
     private static double GetTicksInMilliseconds()
     {
       return DateTime.Now.Ticks / 10_000.0;
+    }
+
+#if DEBUG
+    private void RadioBtnCheckedChanged(object sender, EventArgs e)
+    {
+      if (((RadioButton)sender).Checked)
+        Console.WriteLine("Screen selection has changed. New screen selection: {0}", ((RadioButton)sender).Name);
+    }
+#endif
+
+    private Screen SelectedScreen
+    {
+      get
+      {
+        var radioBtn = ScreenBox.Controls.OfType<RadioButton>().First(rbtn => rbtn.Checked);
+        var screenHashCode = int.Parse(radioBtn.Name.Substring(6));
+        return Screen.AllScreens.First(screen => screen.GetHashCode() == screenHashCode);
+      }
     }
   }
 }
