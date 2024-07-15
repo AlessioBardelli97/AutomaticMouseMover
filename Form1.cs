@@ -11,6 +11,7 @@ namespace AutomaticMouseMover
     private bool mouseMove;
     private readonly Random Random;
     private Thread AnimationThread;
+    private int ScreenHashCode;
 
     private static readonly int AnimationDurationMilliseconds = 1200;
     private static readonly int AnimationSleepMilliseconds = 10;
@@ -34,9 +35,7 @@ namespace AutomaticMouseMover
           AutoSize = true,
         };
 
-#if DEBUG
         radioBtn.CheckedChanged += RadioBtnCheckedChanged;
-#endif
 
         if (screen.Equals(Screen.PrimaryScreen))
           radioBtn.Checked = true;
@@ -44,6 +43,8 @@ namespace AutomaticMouseMover
         ScreenBox.Controls.Add(radioBtn);
         ++i;
       }
+
+      ScreenHashCode = Screen.PrimaryScreen.GetHashCode();
     }
 
     private void StartMouseMoveBtnClick(object sender, EventArgs e)
@@ -110,22 +111,20 @@ namespace AutomaticMouseMover
       return DateTime.Now.Ticks / 10_000.0;
     }
 
-#if DEBUG
     private void RadioBtnCheckedChanged(object sender, EventArgs e)
     {
-      if (((RadioButton)sender).Checked)
+      var radioBtn = (RadioButton)sender;
+      if (radioBtn.Checked)
+        ScreenHashCode = int.Parse(radioBtn.Name.Substring(6));
+#if DEBUG
+      if (radioBtn.Checked)
         Console.WriteLine("Screen selection has changed. New screen selection: {0}", ((RadioButton)sender).Name);
-    }
 #endif
+    }
 
     private Screen SelectedScreen
     {
-      get
-      {
-        var radioBtn = ScreenBox.Controls.OfType<RadioButton>().First(rbtn => rbtn.Checked);
-        var screenHashCode = int.Parse(radioBtn.Name.Substring(6));
-        return Screen.AllScreens.First(screen => screen.GetHashCode() == screenHashCode);
-      }
+      get => Screen.AllScreens.First(screen => screen.GetHashCode() == ScreenHashCode);
     }
   }
 }
