@@ -25,7 +25,7 @@ namespace AutomaticMouseMover
       AnimationThread = null;
 
       ushort i = 0;
-      foreach (var screen in Screen.AllScreens)
+      foreach (var screen in Screen.AllScreens.Reverse())
       {
         var radioBtn = new RadioButton
         {
