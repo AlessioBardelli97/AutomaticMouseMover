@@ -39,6 +39,8 @@
       // 
       // StartMouseMoveBtn
       // 
+      this.StartMouseMoveBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.StartMouseMoveBtn.Location = new System.Drawing.Point(3, 3);
       this.StartMouseMoveBtn.Name = "StartMouseMoveBtn";
       this.StartMouseMoveBtn.Size = new System.Drawing.Size(110, 23);
@@ -49,6 +51,8 @@
       // 
       // StopMouseMoveBtn
       // 
+      this.StopMouseMoveBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.StopMouseMoveBtn.Enabled = false;
       this.StopMouseMoveBtn.Location = new System.Drawing.Point(3, 32);
       this.StopMouseMoveBtn.Name = "StopMouseMoveBtn";
@@ -60,9 +64,9 @@
       // 
       // PanelButtons
       // 
-      this.PanelButtons.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+      this.PanelButtons.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.PanelButtons.AutoSize = true;
       this.PanelButtons.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
       this.PanelButtons.Controls.Add(this.StartMouseMoveBtn);
       this.PanelButtons.Controls.Add(this.StopMouseMoveBtn);
@@ -72,11 +76,13 @@
       this.PanelButtons.Location = new System.Drawing.Point(14, 14);
       this.PanelButtons.Margin = new System.Windows.Forms.Padding(5);
       this.PanelButtons.Name = "PanelButtons";
-      this.PanelButtons.Size = new System.Drawing.Size(116, 193);
+      this.PanelButtons.Size = new System.Drawing.Size(116, 98);
       this.PanelButtons.TabIndex = 4;
       // 
       // CloseBtn
       // 
+      this.CloseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+      this.CloseBtn.AutoSize = true;
       this.CloseBtn.Location = new System.Drawing.Point(3, 61);
       this.CloseBtn.Name = "CloseBtn";
       this.CloseBtn.Size = new System.Drawing.Size(110, 23);
@@ -90,7 +96,7 @@
       this.ScreenBox.AutoSize = true;
       this.ScreenBox.Location = new System.Drawing.Point(3, 90);
       this.ScreenBox.Name = "ScreenBox";
-      this.ScreenBox.Size = new System.Drawing.Size(6, 19);
+      this.ScreenBox.Size = new System.Drawing.Size(6, 5);
       this.ScreenBox.TabIndex = 5;
       this.ScreenBox.TabStop = false;
       this.ScreenBox.Text = "Scermo";
@@ -100,7 +106,7 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.AutoSize = true;
-      this.ClientSize = new System.Drawing.Size(146, 219);
+      this.ClientSize = new System.Drawing.Size(144, 159);
       this.ControlBox = false;
       this.Controls.Add(this.PanelButtons);
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -111,6 +117,7 @@
       this.PanelButtons.ResumeLayout(false);
       this.PanelButtons.PerformLayout();
       this.ResumeLayout(false);
+      this.PerformLayout();
 
     }
 
