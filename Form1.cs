@@ -29,7 +29,7 @@ namespace AutomaticMouseMover
       {
         var radioBtn = new RadioButton
         {
-          Text = $"Schermo ({screen.Bounds.Height} x {screen.Bounds.Width})",
+          Text = $"Schermo ({screen.Bounds.Width} x {screen.Bounds.Height})",
           Name = $"Screen{screen.GetHashCode()}",
           Location = new Point(10, (i+1) * 25),
           AutoSize = true,
