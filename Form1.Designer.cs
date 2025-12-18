@@ -111,7 +111,6 @@
       this.Controls.Add(this.PanelButtons);
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-      this.Location = new System.Drawing.Point(300, 300);
       this.Name = "AutomaticMaouseMoverForm";
       this.Text = "Automatic Mouse Mover";
       this.PanelButtons.ResumeLayout(false);

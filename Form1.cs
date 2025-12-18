@@ -11,7 +11,7 @@ namespace AutomaticMouseMover
     private bool mouseMove;
     private readonly Random Random;
     private Thread AnimationThread;
-    private int ScreenHashCode;
+    private int? ScreenHashCode = null;
 
     private static readonly int AnimationDurationMilliseconds = 1200;
     private static readonly int AnimationSleepMilliseconds = 10;
@@ -24,31 +24,40 @@ namespace AutomaticMouseMover
       mouseMove = false;
       AnimationThread = null;
 
-      ushort i = 0;
-      foreach (var screen in Screen.AllScreens.Reverse())
-      {
-        var radioBtn = new RadioButton
+      Load += (o, e) => {
+        ushort i = 0;
+        foreach (var screen in Screen.AllScreens.Reverse())
         {
-          Text = $"Schermo ({screen.Bounds.Width} x {screen.Bounds.Height})",
-          Name = $"Screen{screen.GetHashCode()}",
-          Location = new Point(10, (i+1) * 25),
-          AutoSize = true,
-        };
+          var radioBtn = new RadioButton
+          {
+            Text = $"Schermo ({screen.Bounds.Width} x {screen.Bounds.Height})",
+            Name = $"Screen{screen.GetHashCode()}",
+            Location = new Point(10, (i + 1) * 25),
+            AutoSize = true,
+          };
 
-        radioBtn.CheckedChanged += RadioBtnCheckedChanged;
+          radioBtn.CheckedChanged += RadioBtnCheckedChanged;
 
-        if (screen.Equals(Screen.PrimaryScreen))
-          radioBtn.Checked = true;
+          if (screen.Bounds.Contains(Bounds))
+          {
+            radioBtn.Checked = true;
+            ScreenHashCode = screen.GetHashCode();
+          }
 
-        ScreenBox.Controls.Add(radioBtn);
-        ++i;
-      }
-
-      ScreenHashCode = Screen.PrimaryScreen.GetHashCode();
+          ScreenBox.Controls.Add(radioBtn);
+          ++i;
+        }
+      };
     }
 
     private void StartMouseMoveBtnClick(object sender, EventArgs e)
     {
+      if (!SelectedScreenBounds.HasValue)
+      {
+        MessageBox.Show("Nessuno schermo selezionato.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        return;
+      }
+
       mouseMove = true;
       StopMouseMoveBtn.Enabled = true;
       StartMouseMoveBtn.Enabled = false;
@@ -59,11 +68,11 @@ namespace AutomaticMouseMover
           var OldX = Cursor.Position.X;
           var OldY = Cursor.Position.Y;
 
-          int minX = SelectedScreen.Bounds.X;
-          int maxX = minX + SelectedScreen.Bounds.Width;
+          int minX = SelectedScreenBounds?.X ?? 0;
+          int maxX = minX + SelectedScreenBounds?.Width ?? 0;
 
-          int minY = SelectedScreen.Bounds.Y;
-          int maxY = minY + SelectedScreen.Bounds.Height;
+          int minY = SelectedScreenBounds?.Y ?? 0;
+          int maxY = minY + SelectedScreenBounds?.Height ?? 0;
 
           var TotalDx = Random.Next(minX, maxX) - OldX;
           var TotalDy = Random.Next(minY, maxY) - OldY;
@@ -106,6 +115,7 @@ namespace AutomaticMouseMover
       AnimationThread?.Join();
       Application.Exit();
     }
+
     private static double GetTicksInMilliseconds()
     {
       return DateTime.Now.Ticks / 10_000.0;
@@ -122,9 +132,14 @@ namespace AutomaticMouseMover
 #endif
     }
 
-    private Screen SelectedScreen
+    private Rectangle? SelectedScreenBounds
     {
-      get => Screen.AllScreens.First(screen => screen.GetHashCode() == ScreenHashCode);
+      get
+      {
+        if (ScreenHashCode != null)
+          return Screen.AllScreens.First(screen => screen.GetHashCode() == ScreenHashCode).Bounds;
+        else return null;
+      }
     }
   }
 }
