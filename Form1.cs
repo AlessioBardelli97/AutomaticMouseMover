@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace AutomaticMouseMover
 {
@@ -11,7 +12,7 @@ namespace AutomaticMouseMover
     private bool mouseMove;
     private readonly Random Random;
     private Thread AnimationThread;
-    private int? ScreenHashCode = null;
+    private string ScreenDeviceName;
 
     private static readonly int AnimationDurationMilliseconds = 1200;
     private static readonly int AnimationSleepMilliseconds = 10;
@@ -23,31 +24,56 @@ namespace AutomaticMouseMover
       Random = new Random((int) GetTicksInMilliseconds());
       mouseMove = false;
       AnimationThread = null;
+      ScreenDeviceName = null;
 
-      Load += (o, e) => {
-        ushort i = 0;
-        foreach (var screen in Screen.AllScreens.Reverse())
+      Load += (s, e) => BuildScreenList();
+
+      SystemEvents.DisplaySettingsChanged += (s, e) => {
+#if DEBUG
+        Console.WriteLine("User has changed the screens settings");
+#endif
+        StopMouseMoveBtnClick(s, e);
+        ScreenBox.Controls.Clear();
+        BuildScreenList();
+        if (ScreenBox.Controls.Count == 1)
         {
-          var radioBtn = new RadioButton
-          {
-            Text = $"Schermo ({screen.Bounds.Width} x {screen.Bounds.Height})",
-            Name = $"Screen{screen.GetHashCode()}",
-            Location = new Point(10, (i + 1) * 25),
-            AutoSize = true,
-          };
-
-          radioBtn.CheckedChanged += RadioBtnCheckedChanged;
-
-          if (screen.Bounds.Contains(Bounds))
-          {
-            radioBtn.Checked = true;
-            ScreenHashCode = screen.GetHashCode();
-          }
-
-          ScreenBox.Controls.Add(radioBtn);
-          ++i;
+          StartMouseMoveBtnClick(s, e);
+          StopMouseMoveBtn.Focus();
         }
       };
+    }
+
+    private void BuildScreenList()
+    {
+      ushort i = 0;
+      foreach (var screen in Screen.AllScreens.Reverse())
+      {
+        var radioBtn = new RadioButton
+        {
+          Text = $"Schermo ({screen.Bounds.Width} x {screen.Bounds.Height})",
+          Name = screen.DeviceName,
+          Location = new Point(10, (i + 1) * 25),
+          AutoSize = true,
+        };
+
+        radioBtn.CheckedChanged += (s, e) => {
+          if (radioBtn.Checked)
+            ScreenDeviceName = radioBtn.Name;
+#if DEBUG
+          if (radioBtn.Checked)
+            Console.WriteLine("Screen selection has changed. New screen selection: {0}", radioBtn.Name);
+#endif
+        };
+
+        if (screen.Bounds.Contains(Bounds))
+        {
+          radioBtn.Checked = true;
+          ScreenDeviceName = screen.DeviceName;
+        }
+
+        ScreenBox.Controls.Add(radioBtn);
+        ++i;
+      }
     }
 
     private void StartMouseMoveBtnClick(object sender, EventArgs e)
@@ -121,23 +147,12 @@ namespace AutomaticMouseMover
       return DateTime.Now.Ticks / 10_000.0;
     }
 
-    private void RadioBtnCheckedChanged(object sender, EventArgs e)
-    {
-      var radioBtn = (RadioButton)sender;
-      if (radioBtn.Checked)
-        ScreenHashCode = int.Parse(radioBtn.Name.Substring(6));
-#if DEBUG
-      if (radioBtn.Checked)
-        Console.WriteLine("Screen selection has changed. New screen selection: {0}", ((RadioButton)sender).Name);
-#endif
-    }
-
     private Rectangle? SelectedScreenBounds
     {
       get
       {
-        if (ScreenHashCode != null)
-          return Screen.AllScreens.First(screen => screen.GetHashCode() == ScreenHashCode).Bounds;
+        if (ScreenDeviceName != null)
+          return Screen.AllScreens.First(screen => screen.DeviceName == ScreenDeviceName).Bounds;
         else return null;
       }
     }
